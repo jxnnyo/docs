@@ -1,10 +1,72 @@
 ---
-title: 'Events'
-description: 'Instructions on how to send and configure dispatch events'
+title: "Events"
+description: "Instructions on how to send and configure dispatch events"
 ---
 
-<img
-  src="/images/dispatch/hero.png"
-  className="rounded-md"
-  alt="Hero"
-/>
+<img src="/assets/dispatch/hero.png" className="rounded-md" alt="Hero" />
+
+This guide will assist you in converting your dispatch notifications to `jx_dispatch`. In this guide we will look at the conversion from `ps-dispatch`.
+
+## 1. Finding and replacing
+
+Find an instance of `ps-dispatch` sending an event, for example
+
+```lua
+exports['ps-dispatch']:StoreRobbery()
+```
+
+replace this with
+
+```lua
+exports['jx_dispatch']:SendDispatchEvent('store-robbery')
+```
+
+## 2. Configuring the event
+
+Open `resource/config.lua` and scroll down to the end of Config.Events. Copy and paste the last element in the table and paste it after and configure it to your needs. You need to set the key of the table to whatever you put in Step 1. An example for a store robbery would,
+
+```lua config.lua
+Config = {
+  ...
+  Events = {
+    ...,
+    store-robbery = {
+      tenCode = "10-90",
+      label = 'Store Robbery',
+      blipSprite = 313,
+      blipColor = 24,
+      icon = "shopping-basket",
+      jobs = { "police", "ambulance" },
+      metadata = {
+        {
+          icon = "locate",
+          text = "{street}",
+        },
+        {
+          icon = "circle-user",
+          text = "{gender}",
+        },
+      }
+    },
+  }
+}
+```
+
+## Configuration Options
+
+- `tenCode`: 10 codes to effectively communicate dispatch events. [List of 10-codes can be found here](https://copradar.com/tencodes/)
+- `label`: What is happening? (example: Store Robbery, Officer Down)
+- `autoRoute?`: Whether or not it should automatically mark on player's maps (true or false)
+- `blipSprite`: Which sprite to show on the GPS. [Available options here](https://docs.fivem.net/docs/game-references/blips/#blips)
+- `blipColor`: Which color should the blip be on the GPS. [Available options here](https://docs.fivem.net/docs/game-references/blips/#blip-colors)
+- `icon`: We use [Lucide](https://lucide.dev/) for our icon library. Documentation for finding the correct value for here can be found [here](https://scribehow.com/shared/Find_and_download_icons_from_Lucide_website__1Ky67RRdT9aC4K_bdef_2w?referrer=docs)
+- `jobs`: This is an object with all jobs that should receive the dispatch event. `Example: {"police", "ambulance"}`
+- `sound?`: This is optional but we provide you with 4 built-in sounds. Previews for these can be found [here](/dispatch/events#sounds)
+- `metadata`: More extensive documentation for this can be found [here](/dispatch/metadata)
+
+## Sounds
+
+- <a href="/assets/dispatch/tetra_1.mp3" target="_blank" rel="noopener noreferrer">tetra_1</a>
+- <a href="/assets/dispatch/tetra_2.mp3" target="_blank" rel="noopener noreferrer">tetra_2</a>
+- <a href="/assets/dispatch/tetra_3.mp3" target="_blank" rel="noopener noreferrer">tetra_3</a>
+- <a href="/assets/dispatch/tetra_4.mp3" target="_blank" rel="noopener noreferrer">tetra_4</a>

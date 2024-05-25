@@ -37,7 +37,8 @@
       "group": "💻 Dispatch",
       "pages": [
         "dispatch/installation",
-        "dispatch/events"
+        "dispatch/events",
+        "dispatch/metadata"
       ]
     }
   ],

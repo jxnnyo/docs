@@ -1,0 +1,41 @@
+---
+title: "Metadata"
+description: "Instructions for setting up your metadata field"
+---
+
+<img src="/assets/dispatch/hero.png" className="rounded-md" alt="Hero" />
+
+## Structure (Example)
+
+```lua config.lua
+{
+    {
+        icon = "circle-user",
+        text = "{callsign} | {name}",
+    },
+    {
+        icon = "locate",
+        text = "{street}",
+    },
+    {
+        icon = "circle-user",
+        text = "{gender}",
+    },
+}
+```
+
+## Breakdown
+
+- `icon`: We use [Lucide](https://lucide.dev/) for our icon library. Documentation for finding the correct value for here can be found [here](https://scribehow.com/shared/Find_and_download_icons_from_Lucide_website__1Ky67RRdT9aC4K_bdef_2w?referrer=docs)
+- `text`: This is a string but has extended capabilities, these are 'template strings'. We replace anything that has a string surrounded by {} if we have the data. Current options can be found below.
+
+## Options
+
+| Option     | Description                                                                    |
+|------------|--------------------------------------------------------------------------------|
+| callsign   | The player's callsign                                                          |
+| first_name | The character's first name.                                                    |
+| last_name  | The character's last name.                                                     |
+| name       | The character's full name.                                                     |
+| gender     | The character's gender. (Male or Female)                                       |
+| street     | The player's current street name and zone. (San Andreas Ave, Vespucci Canals)  |
