@@ -1,0 +1,303 @@
+---
+title: 'Other Installation Guide'
+description: 'Instruction guide for other frameworks such as ESX or custom-built'
+---
+
+<img
+  src="/images/dispatch/hero.png"
+  className="rounded-md"
+  alt="Hero"
+/>
+
+Installing **jx_dispatch** with a framework that is not QBCore/Qbox takes slightly longer to setup.
+
+We do not provide built-in support for frameworks like ESX as they differ from server to server. However, we offer a way for you to manually set it up to your needs.
+
+## 1. Installing the resource
+
+Download the resource and put it into your server files along with [ox_lib](https://github.com/overextended/ox_lib).
+
+Start order must be like this
+
+```cfg server.cfg
+ensure ox_lib
+ensure jx_dispatch
+```
+
+## 2. Setting up the framework
+
+To start off with open `resource/config.lua` and change `Config.Framework` to `custom`.
+
+Now, if you navigate to `resource/framework/custom/server.lua` you can see there is a template of the required functions needed to run the dispatch.
+
+The following is a list of all functions and what should be returned:
+
+- `GetPlayerCallsign` - should return the player's callsign (if using ESX this doesn't exist so return an empty string and remove all instances of `{callsign}` in `Config.Events`)
+- `GetPlayerFirstName` - should return the player's in-character first name
+- `GetPlayerLastName` - should return the player's in-character last name
+- `GetPlayerGender` - should return `Male` or `Female` based on the player's gender
+- `GetPlayerJob` - should return 2 values - the player's job name and their grade display name an example would be `return 'police', 'Chief'`
+
+An example for [base ESX](https://github.com/esx-framework/esx-legacy) would be this
+
+<CodeGroup>
+```lua server.lua
+if Config.Framework ~= "custom" then
+    return
+end
+
+local ESX = exports["es_extended"]:getSharedObject()
+
+local data = ESX.GetPlayerData()
+
+local first_name = data.firstname
+local last_name = data.lastname
+local sex = data.sex
+
+function GetPlayerCallsign(source)
+    return ""
+end
+
+function GetPlayerFirstName(source)
+    return first_name
+end
+
+function GetPlayerLastName(source)
+    return last_name
+end
+
+function GetPlayerGender(source)
+    return sex
+end
+
+function GetPlayerJob(source)
+    local updatedData = ESX.GetPlayerData()
+    return updatedData.job.name, updatedData.job.grade_name
+end
+```
+
+```lua config.lua
+Config = {
+    Framework = "custom",                         -- "qbox" || "qbcore" || "custom"
+    JobChangeEvent = "QBCore:Server:OnJobUpdate", -- this does not need changing for qbox and qbcore however if using a custom framework please modify
+
+    DefaultKey = "o",                             -- Options are here https://docs.fivem.net/docs/game-references/input-mapper-parameter-ids/keyboard/
+
+    EMSJobs = { "ambulance" },                    -- Any job names that relate to EMS
+    PoliceJobs = { "police" },                    -- Any job that related to Police
+
+    DispatchDecayTime = 30,                       -- Time it takes for the dispatch event to decay in minutes.
+
+    BlipScale = 0.75,
+
+    Events = {
+        panic_ems = {
+            tenCode = "10-33",
+            label = 'EMS in Distress',
+            autoRoute = true,
+            blipSprite = 61,
+            blipColor = 1,
+            icon = "siren",
+            jobs = { "police", "ambulance" },
+            sound = "tetra_4",
+            metadata = {
+                {
+                    icon = "circle-user",
+                    text = "{name}",
+                },
+                {
+                    icon = "locate",
+                    text = "{street}",
+                },
+                {
+                    icon = "circle-user",
+                    text = "{gender}",
+                },
+            }
+        },
+        panic_police = {
+            tenCode = "10-33",
+            label = 'Officer in Distress',
+            autoRoute = true,
+            blipSprite = 137,
+            blipColor = 1,
+            icon = "siren",
+            jobs = { "police", "ambulance" },
+            sound = "tetra_4",
+            metadata = {
+                {
+                    icon = "circle-user",
+                    text = "{name}",
+                },
+                {
+                    icon = "locate",
+                    text = "{street}",
+                },
+                {
+                    icon = "circle-user",
+                    text = "{gender}",
+                },
+            }
+        },
+        request_ems = {
+            tenCode = "10-52",
+            label = 'EMS Required',
+            blipSprite = 280,
+            blipColor = 1,
+            icon = "ambulance",
+            jobs = { "police", "ambulance" },
+            sound = "tetra_1",
+            metadata = {
+                {
+                    icon = "locate",
+                    text = "{street}",
+                },
+                {
+                    icon = "circle-user",
+                    text = "{gender}",
+                },
+            }
+        },
+        shots_fired = {
+            tenCode = "10-13",
+            label = 'Shots Fired',
+            blipSprite = 110,
+            blipColor = 49,
+            icon = "shield-alert",
+            jobs = { "police", "ambulance" },
+            metadata = {
+                {
+                    icon = "locate",
+                    text = "{street}",
+                },
+                {
+                    icon = "circle-user",
+                    text = "{gender}",
+                },
+            }
+        },
+        ems_shots_fired = {
+            tenCode = "10-13",
+            label = 'EMS Shots Fired',
+            blipSprite = 110,
+            blipColor = 5,
+            icon = "shield-alert",
+            jobs = { "police", "ambulance" },
+            metadata = {
+                {
+                    icon = "circle-user",
+                    text = "{name}",
+                },
+                {
+                    icon = "locate",
+                    text = "{street}",
+                }
+            }
+        },
+        police_shots_fired = {
+            tenCode = "10-13",
+            label = 'Officer Shots Fired',
+            blipSprite = 110,
+            blipColor = 57,
+            icon = "shield-alert",
+            jobs = { "police", "ambulance" },
+            metadata = {
+                {
+                    icon = "circle-user",
+                    text = "{name}",
+                },
+                {
+                    icon = "locate",
+                    text = "{street}",
+                }
+            }
+        },
+        tazer_deployed = {
+            tenCode = "10-13",
+            label = 'Tazer Deployed',
+            blipSprite = 110,
+            blipColor = 5,
+            icon = "shield-alert",
+            jobs = { "police", "ambulance" },
+            metadata = {
+                {
+                    icon = "circle-user",
+                    text = "{name}",
+                },
+                {
+                    icon = "locate",
+                    text = "{street}",
+                }
+            }
+        },
+        ems_down = {
+            tenCode = "10-52",
+            label = 'EMS Down',
+            blipSprite = 280,
+            blipColor = 5,
+            icon = "ambulance",
+            jobs = { "police", "ambulance" },
+            sound = "tetra_1",
+            metadata = {
+                {
+                    icon = "circle-user",
+                    text = "{name}",
+                },
+                {
+                    icon = "locate",
+                    text = "{street}",
+                }
+            }
+        },
+        police_down = {
+            tenCode = "10-52",
+            label = 'Officer Down',
+            blipSprite = 280,
+            blipColor = 57,
+            icon = "ambulance",
+            jobs = { "police", "ambulance" },
+            sound = "tetra_1",
+            metadata = {
+                {
+                    icon = "circle-user",
+                    text = "{name}",
+                },
+                {
+                    icon = "locate",
+                    text = "{street}",
+                }
+            }
+        },
+        player_down = {
+            tenCode = "10-52",
+            label = 'EMS Required',
+            blipSprite = 280,
+            blipColor = 1,
+            icon = "ambulance",
+            jobs = { "police", "ambulance" },
+            sound = "tetra_1",
+            metadata = {
+                {
+                    icon = "locate",
+                    text = "{street}",
+                },
+                {
+                    icon = "circle-user",
+                    text = "{gender}",
+                },
+            }
+        },
+    }
+}
+```
+</CodeGroup>
+
+## 2. Configuring the resource
+
+- Open `resource/config.lua`
+- Change the `Config.DefaultKey`, a list of available options are [here](https://docs.fivem.net/docs/game-references/input-mapper-parameter-ids/keyboard/)
+- Add all of your police jobs to the `Config.PoliceJobs` value
+- Add all of your EMS jobs to the `Config.EMSJobs` value
+- Setting `Config.DispatchDecayTime` will change how long an event takes to 'delete'
+- Setting `Config.BlipScale` will change how large/small your blips are.
+- We recommend looking through all of the `Config.Events` that are shipped by default and customising them to your server - blip sprites can be found [here](https://docs.fivem.net/docs/game-references/blips/#blips) and blip colours can be found [here](https://docs.fivem.net/docs/game-references/blips/#blip-colors)

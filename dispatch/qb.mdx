@@ -1,0 +1,34 @@
+---
+title: 'Qbox/QBCore Installation Guide'
+description: 'Instruction guide for Qbox/QBCore servers'
+---
+
+<img
+  src="/images/dispatch/hero.png"
+  className="rounded-md"
+  alt="Hero"
+/>
+
+Installing **jx_dispatch** with Qbox/QBCore based servers is a two-step process: install, configure. 
+
+## 1. Installing the resource
+
+Download the resource and put it into your server files along with [ox_lib](https://github.com/overextended/ox_lib).
+
+Start order must be like this
+
+```cfg server.cfg
+ensure ox_lib
+ensure jx_dispatch
+```
+
+## 2. Configuring the resource
+
+- Open `resource/config.lua`
+- Set the `Config.Framework` value to either `qbox` or `qbcore`
+- Change the `Config.DefaultKey`, a list of available options are [here](https://docs.fivem.net/docs/game-references/input-mapper-parameter-ids/keyboard/)
+- Add all of your police jobs to the `Config.PoliceJobs` value
+- Add all of your EMS jobs to the `Config.EMSJobs` value
+- Setting `Config.DispatchDecayTime` will change how long an event takes to 'delete'
+- Setting `Config.BlipScale` will change how large/small your blips are.
+- We recommend looking through all of the `Config.Events` that are shipped by default and customising them to your server - blip sprites can be found [here](https://docs.fivem.net/docs/game-references/blips/#blips) and blip colours can be found [here](https://docs.fivem.net/docs/game-references/blips/#blip-colors)
